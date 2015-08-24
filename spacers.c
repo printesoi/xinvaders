@@ -22,7 +22,7 @@ Wed May  8 1991
 Boolean spacer_shown;
 
 #define SPACERY 0
-#define SPACERV 2*scale
+#define SPACERV 2*gameInfo.scale
 
 typedef struct _SpacerRec {
   int x;			/* Location. */
@@ -112,7 +112,7 @@ void MoveSpacer(closure, id)
      XtIntervalId id;
 {
   if (closure != (Opaque) MoveSpacer) return;
-  spacertimerid = XtAddTimeOut(spacerwait, MoveSpacer, (Opaque) MoveSpacer);
+  spacertimerid = XtAddTimeOut(gameInfo.spacerwait, MoveSpacer, (Opaque) MoveSpacer);
   if (!paused) {
     if (showing_sexplosion) {
       showing_sexplosion = FALSE;
@@ -141,15 +141,15 @@ void MoveSpacer(closure, id)
 
 int ReadSpacerImages()
 {
-  spacer->width = (scale == 1) ? spacer1_width : spacer2_width;
-  spacer->height = (scale == 1) ? spacer1_height : spacer2_height;
+  spacer->width = (gameInfo.scale == 1) ? spacer1_width : spacer2_width;
+  spacer->height = (gameInfo.scale == 1) ? spacer1_height : spacer2_height;
 
   spacer->shape_image = XCreateImage(dpy,
 				     DefaultVisual(dpy, DefaultScreen(dpy)),
 				     1,
 				     XYBitmap,
 				     0,
-				     (scale == 1) ? spacer1_bits : spacer2_bits,
+				     (gameInfo.scale == 1) ? spacer1_bits : spacer2_bits,
 				     spacer->width, spacer->height,
 				     8, 0);
 

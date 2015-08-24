@@ -99,8 +99,8 @@ XSetWindowAttributes *attributes;
   XtCreateWindow(w, (unsigned int) InputOutput, (Visual *) CopyFromParent,
 		 *valueMask, attributes);
 
-  gamewidth = scale*VWIDTH;
-  gameheight = scale*VHEIGHT;
+  gamewidth = gameInfo.scale*VWIDTH;
+  gameheight = gameInfo.scale*VHEIGHT;
   gamewindow = XtWindow(gamewidget);
   labelwindow = XtWindow(labelwidget);
 
@@ -109,54 +109,54 @@ XSetWindowAttributes *attributes;
   foregc = XCreateGC(dpy, XtWindow(w),
 		     (XtGCMask) GCForeground | GCBackground, &forevalues);
   XSetFunction(dpy, foregc, GXcopy);
-  backvalues.background = defaultback;
-  backvalues.foreground = defaultback;
+  backvalues.background = gameInfo.defaultback;
+  backvalues.foreground = gameInfo.defaultback;
   backgc = XCreateGC(dpy, XtWindow(w),
 		     (XtGCMask) GCForeground | GCBackground, &backvalues);
   XSetFunction(dpy, backgc, GXcopy);
-  basevalues.background = defaultback;
-  basevalues.foreground = basepixel;
+  basevalues.background = gameInfo.defaultback;
+  basevalues.foreground = gameInfo.basepixel;
   basegc = XCreateGC(dpy, XtWindow(w),
 		     (XtGCMask) GCForeground | GCBackground, &basevalues);
   XSetFunction(dpy, basegc, GXcopy);
-  buildingvalues.background = defaultback;
-  buildingvalues.foreground = buildingpixel;
+  buildingvalues.background = gameInfo.defaultback;
+  buildingvalues.foreground = gameInfo.buildingpixel;
   buildinggc = XCreateGC(dpy, XtWindow(w),
 		     (XtGCMask) GCForeground | GCBackground, &buildingvalues);
   XSetFunction(dpy, buildinggc, GXcopy);
-  vader1values.background = defaultback;
-  vader1values.foreground = vader1pixel;
+  vader1values.background = gameInfo.defaultback;
+  vader1values.foreground = gameInfo.vader1pixel;
   vadergc[0] = XCreateGC(dpy, XtWindow(w),
 			 (XtGCMask) GCForeground | GCBackground, &vader1values);
   XSetFunction(dpy, vadergc[0], GXcopy);
-  vader2values.background = defaultback;
-  vader2values.foreground = vader2pixel;
+  vader2values.background = gameInfo.defaultback;
+  vader2values.foreground = gameInfo.vader2pixel;
   vadergc[1] = XCreateGC(dpy, XtWindow(w),
 			 (XtGCMask) GCForeground | GCBackground, &vader2values);
   XSetFunction(dpy, vadergc[1], GXcopy);
-  vader3values.background = defaultback;
-  vader3values.foreground = vader3pixel;
+  vader3values.background = gameInfo.defaultback;
+  vader3values.foreground = gameInfo.vader3pixel;
   vadergc[2] = XCreateGC(dpy, XtWindow(w),
 			 (XtGCMask) GCForeground | GCBackground, &vader3values);
   XSetFunction(dpy, vadergc[2], GXcopy);
-  shotvalues.background = defaultback;
-  shotvalues.foreground = shotpixel;
+  shotvalues.background = gameInfo.defaultback;
+  shotvalues.foreground = gameInfo.shotpixel;
   shotgc = XCreateGC(dpy, XtWindow(w),
 		     (XtGCMask) GCForeground | GCBackground, &shotvalues);
   XSetFunction(dpy, shotgc, GXcopy);
-  scorevalues.background = defaultback;
-  scorevalues.foreground = scorepixel;
-  scorevalues.font = XLoadFont(dpy, vaderfont);
+  scorevalues.background = gameInfo.defaultback;
+  scorevalues.foreground = gameInfo.scorepixel;
+  scorevalues.font = XLoadFont(dpy, gameInfo.vaderfont);
   scoregc = XCreateGC(dpy, XtWindow(w),
 		     (XtGCMask) GCForeground | GCBackground | GCFont, &scorevalues);
   XSetFunction(dpy, scoregc, GXcopy);
-  shotvalues.background = defaultback;
-  shotvalues.foreground = vshotpixel;
+  shotvalues.background = gameInfo.defaultback;
+  shotvalues.foreground = gameInfo.vshotpixel;
   vshotgc = XCreateGC(dpy, XtWindow(w),
 		      (XtGCMask) GCForeground | GCBackground, &shotvalues);
   XSetFunction(dpy, vshotgc, GXcopy);
-  spacervalues.background = defaultback;
-  spacervalues.foreground = spacerpixel;
+  spacervalues.background = gameInfo.defaultback;
+  spacervalues.foreground = gameInfo.spacerpixel;
   spacergc = XCreateGC(dpy, XtWindow(w),
 		       (XtGCMask) GCForeground | GCBackground, &spacervalues);
   XSetFunction(dpy, spacergc, GXcopy);
@@ -191,18 +191,18 @@ void SuspendTimers()
 void EnableTimers()
 {
   if (basetimerid == 0)
-    basetimerid = XtAddTimeOut(basewait, MoveBase, (Opaque) MoveBase);
+    basetimerid = XtAddTimeOut(gameInfo.basewait, MoveBase, (Opaque) MoveBase);
   if (vadertimerid == 0)
-    vadertimerid = XtAddTimeOut(vaderwait, MoveVaders,
+    vadertimerid = XtAddTimeOut(gameInfo.vaderwait, MoveVaders,
 			       (Opaque) MoveVaders);
   if(spacertimerid == 0)
-    spacertimerid = XtAddTimeOut(spacerwait, MoveSpacer,
+    spacertimerid = XtAddTimeOut(gameInfo.spacerwait, MoveSpacer,
 				 (Opaque) MoveSpacer);
   if (shottimerid == 0)
-    shottimerid = XtAddTimeOut(shotwait, MoveShots,
+    shottimerid = XtAddTimeOut(gameInfo.shotwait, MoveShots,
 			       (Opaque) MoveShots);
   if (vshottimerid == 0)
-    vshottimerid = XtAddTimeOut(vshotwait, MoveVshots,
+    vshottimerid = XtAddTimeOut(gameInfo.vshotwait, MoveVshots,
 				(Opaque) MoveVshots);
 }
 
@@ -320,24 +320,24 @@ XEvent *event;
 			    1,
 			    XYBitmap,
 			    0,
-			    (scale == 1) ? me1_bits:me2_bits,
-			    (scale == 1) ? me1_width : me2_width,
-			    (scale == 1) ? me1_height: me2_height,
+			    (gameInfo.scale == 1) ? me1_bits:me2_bits,
+			    (gameInfo.scale == 1) ? me1_width : me2_width,
+			    (gameInfo.scale == 1) ? me1_height: me2_height,
 			    8, 0);
     me_image->bitmap_bit_order = LSBFirst;
     me_image->byte_order = LSBFirst;
   }
   
-  xloc = (gamewidth-((scale == 1) ? me1_width : me2_width))/2;
-  yloc = ((scale == 1) ? me1_width : me2_width) + 10;
+  xloc = (gamewidth-((gameInfo.scale == 1) ? me1_width : me2_width))/2;
+  yloc = ((gameInfo.scale == 1) ? me1_width : me2_width) + 10;
 
   XPutImage(dpy, gamewindow, foregc, me_image,
 	    0, 0, 
 	    xloc, 0,
-	    (scale == 1) ? me1_width : me2_width,
-	    (scale == 1) ? me1_height: me2_height);
+	    (gameInfo.scale == 1) ? me1_width : me2_width,
+	    (gameInfo.scale == 1) ? me1_height: me2_height);
 
-  if (scale == 2)
+  if (gameInfo.scale == 2)
     XDrawImageString(dpy, gamewindow, scoregc, xloc, yloc, _("Xinvaders, by Jonny Goldman"), strlen(_("Xinvaders, by Jonny Goldman")));
   else {
     XDrawImageString(dpy, gamewindow, scoregc, xloc+30, yloc, "Xinvaders", 9);

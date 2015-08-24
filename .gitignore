@@ -8,3 +8,4 @@ po/Makefile.in
 po/POTFILES
 stamp-h
 intl/po2tbl.sed
+xinvaders

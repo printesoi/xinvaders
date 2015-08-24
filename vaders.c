@@ -23,9 +23,9 @@ Wed May  8 1991
 #define NUMROWS		5	/* number of rows of vaders */
 #define NUMVADERS	11	/* Maximum of vaders of each type. */
 #define BASEY 10
-#define VADERWIDTH	(14*scale)
-#define VADERHEIGHT	(12*scale)
-#define VADERYINC	(8*scale)
+#define VADERWIDTH	(14*gameInfo.scale)
+#define VADERHEIGHT	(12*gameInfo.scale)
+#define VADERYINC	(8*gameInfo.scale)
 
 static XImage *Vader_Image[NUMTYPES][2];	/* XImages for the vaders. */
 
@@ -62,7 +62,7 @@ extern Base base;
 XImage *Explode_image;
 
 /* indicates pad around vader bitmap for better collision detection */
-#define VADERPAD 	scale
+#define VADERPAD 	gameInfo.scale
 
 #define PointInVader(vader, x, y)	\
   (x >= (vader)->x+VADERPAD && y >= (vader)->y &&		\
@@ -114,7 +114,7 @@ Vader vader;
   case 4:
   case 2:
   case 1:
-    vaderwait /= 2; break;
+    gameInfo.vaderwait /= 2; break;
   }
   vader->alive = FALSE;
   vader->exploded = TRUE;
@@ -177,7 +177,7 @@ int tick;
 {
   XKeyboardControl vals;
 
-  vals.bell_duration = vaderwait/2;
+  vals.bell_duration = gameInfo.vaderwait/2;
   vals.bell_pitch = tick ? 60 : 40;
 
   XChangeKeyboardControl(dpy, KBBellPitch | KBBellDuration, &vals);
@@ -209,7 +209,7 @@ void MoveVaders(closure, id)
     InitBuildings();
     DrawBuildings();
   } else {
-    vadertimerid = XtAddTimeOut(vaderwait, MoveVaders, (Opaque) MoveVaders);
+    vadertimerid = XtAddTimeOut(gameInfo.vaderwait, MoveVaders, (Opaque) MoveVaders);
     /* this is the way to do it, but on the Sun it SUCKS!
     VaderBoop(tick);
     */
@@ -272,7 +272,7 @@ void MoveVaders(closure, id)
 
 int ReadVaderImages()
 {
-  if (scale == 1) {
+  if (gameInfo.scale == 1) {
     Vader_Image[0][0] = XCreateImage(dpy,
 				     DefaultVisual(dpy, DefaultScreen(dpy)),
 				     1,
@@ -442,14 +442,14 @@ int level;
   Vader vader;
 
   offset = MIN(level, 8);
-  vaderwait = vaderwaitinit;
+  gameInfo.vaderwait = vaderwaitinit;
   numvaders = NUMROWS*NUMVADERS;
   for (j = 0; j < NUMROWS; j++)
     for (i = 0; i < NUMVADERS; i++) {
       vader = &vaders[j][i];
       vader->x = 3 + VADERWIDTH*i+(VADERWIDTH-vader->width)/2;
       vader->y = VADERHEIGHT*(offset+j);
-      vader->vx = scale;
+      vader->vx = gameInfo.scale;
       vader->alive = TRUE;
       vader->exploded = FALSE;
     }
@@ -489,7 +489,7 @@ void InitVaders()
       vader->value = 10*(3-k);
     }
   }
-  vaderwaitinit = vaderwait;
+  vaderwaitinit = gameInfo.vaderwait;
   CreateVaders(level);
   vadertimerid = 0;
 }

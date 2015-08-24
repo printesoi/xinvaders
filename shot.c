@@ -23,7 +23,7 @@ extern int paused;
 
 #define MAXSHOTS	1
 #define MAXVSHOTS	6
-#define SHOTSIZE	(8*scale)
+#define SHOTSIZE	(8*gameInfo.scale)
 
 typedef struct _ShotRec {
     int x, y;		/* Location of this shot. */
@@ -92,7 +92,7 @@ XtIntervalId id;
   if (closure != (Opaque) MoveShots) return;
   if (!paused) {
     if (numshots > 0)
-      shottimerid = XtAddTimeOut(shotwait, MoveShots, (Opaque) MoveShots);
+      shottimerid = XtAddTimeOut(gameInfo.shotwait, MoveShots, (Opaque) MoveShots);
     else
       shottimerid = 0;
     for (i=0 ; i<numshots ; i++) {
@@ -145,12 +145,12 @@ XtIntervalId id;
   if (closure != (Opaque) MoveVshots) return;
   if (!paused) {
     if (numvshots > 0)
-      vshottimerid = XtAddTimeOut(vshotwait, MoveVshots, (Opaque) MoveVshots);
+      vshottimerid = XtAddTimeOut(gameInfo.vshotwait, MoveVshots, (Opaque) MoveVshots);
     else
       vshottimerid = 0;
     for (i=0 ; i<numvshots ; i++) {
       vshot = vshots + i;
-      newy = vshot->y + 2*scale;
+      newy = vshot->y + 2*gameInfo.scale;
       x = vshot->x;
       y = vshot->y;
       if (y>gameheight ||
@@ -176,28 +176,28 @@ void AddShot(x, y)
 int x, y;
 {
     Shot shot;
-    if (numshots >= maxshots) return;
+    if (numshots >= gameInfo.maxshots) return;
     shot = shots + numshots;
     numshots++;
     shot->x = x;
     shot->y = y-SHOTSIZE;
     PaintShot(shot, shotgc);
     if (shottimerid == 0)
-        shottimerid = XtAddTimeOut(shotwait, MoveShots, (Opaque) MoveShots);
+        shottimerid = XtAddTimeOut(gameInfo.shotwait, MoveShots, (Opaque) MoveShots);
 }
 
 void AddVshot(x, y)
 int x, y;
 {
     Shot shot;
-    if (numvshots >= maxvshots) return;
+    if (numvshots >= gameInfo.maxvshots) return;
     shot = vshots + numvshots;
     numvshots++;
     shot->x = x;
     shot->y = y;
     PaintVshot(shot, vshotgc);
     if (vshottimerid == 0)
-      vshottimerid = XtAddTimeOut(shotwait, MoveVshots, (Opaque) MoveVshots);
+      vshottimerid = XtAddTimeOut(gameInfo.shotwait, MoveVshots, (Opaque) MoveVshots);
 }
 
 #include "sperma1.bit"
@@ -212,9 +212,9 @@ int ReadVshotImages()
 				1,
 				XYBitmap,
 				0,
-				(scale == 1) ? sperma1_bits : sperma2_bits,
-				(scale == 1) ? sperma1_width : sperma2_width,
-				(scale == 1) ? sperma1_height : sperma2_height,
+				(gameInfo.scale == 1) ? sperma1_bits : sperma2_bits,
+				(gameInfo.scale == 1) ? sperma1_width : sperma2_width,
+				(gameInfo.scale == 1) ? sperma1_height : sperma2_height,
 				8, 0);
   vshot_image[0]->bitmap_bit_order = LSBFirst;
   vshot_image[0]->byte_order = LSBFirst;
@@ -224,9 +224,9 @@ int ReadVshotImages()
 				1,
 				XYBitmap,
 				0,
-				(scale == 1) ? spermb1_bits : spermb2_bits,
-				(scale == 1) ? spermb1_width : spermb2_width,
-				(scale == 1) ? spermb1_height : spermb2_height,
+				(gameInfo.scale == 1) ? spermb1_bits : spermb2_bits,
+				(gameInfo.scale == 1) ? spermb1_width : spermb2_width,
+				(gameInfo.scale == 1) ? spermb1_height : spermb2_height,
 				8, 0);
   vshot_image[1]->bitmap_bit_order = LSBFirst;
   vshot_image[1]->byte_order = LSBFirst;

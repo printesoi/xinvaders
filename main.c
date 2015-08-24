@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright notice:
 
 This is mine.  I'm only letting you use it.  Period.  Feel free to rip off
@@ -26,7 +26,12 @@ Wed May  8 1991
 #include <X11/IntrinsicP.h>
 #include <X11/Label.h>
 #endif
-static int width, height;		/* Size of window. */
+
+struct windowSize {
+	int width, height;
+} windowSize;
+
+GameInfo gameInfo;
 
 #ifdef XFILESEARCHPATH
 static void AddPathToSearchPath();
@@ -38,53 +43,56 @@ static XrmOptionDescRec table[] = {
     {"-debug",	"*debug",	XrmoptionNoArg,	NULL},
 };
 
+static XtResource windowResourses[] = {
+	{XtNwidth, XtCWidth, XtRInt, sizeof(int),
+		XtOffsetOf(struct windowSize, width), XtRImmediate, (caddr_t)VWIDTH},
+	{XtNheight, XtCHeight, XtRInt, sizeof(int),
+		XtOffsetOf(struct windowSize, height), XtRImmediate, (caddr_t)VHEIGHT},
+};
+
 static XtResource resources[] = {
-    {XtNwidth, XtCWidth, XtRInt, sizeof(int),
-	 (Cardinal)&width, XtRImmediate, (caddr_t) VWIDTH},
-    {XtNheight, XtCHeight, XtRInt, sizeof(int),
-	 (Cardinal)&height, XtRImmediate, (caddr_t) VHEIGHT},
-    {"debug", "Debug", XtRBoolean, sizeof(Boolean),
-	 (Cardinal)&debug, XtRString, "off"},
-    {"font", "Font", XtRString, sizeof(String),
-	 (Cardinal)&vaderfont, XtRString, (String)"9x15"},
-    {"scale", "Scale", XtRInt, sizeof(int),
-	 (Cardinal)&scale, XtRImmediate, (caddr_t) 2},
-    {"basewait", "BaseWait", XtRInt, sizeof(int),
-	 (Cardinal)&basewait, XtRImmediate, (caddr_t) 10},
-    {"vaderwait", "VaderWait", XtRInt, sizeof(int),
-	 (Cardinal)&vaderwait, XtRImmediate, (caddr_t) 300},
-    {"spacerwait", "SpacerWait", XtRInt, sizeof(int),
-	 (Cardinal)&spacerwait, XtRImmediate, (caddr_t) 50},
-    {"shotwait", "ShotWait", XtRInt, sizeof(int),
-	 (Cardinal)&shotwait, XtRImmediate, (caddr_t) 10},
-    {"vshotwait", "VshotWait", XtRInt, sizeof(int),
-	 (Cardinal)&vshotwait, XtRImmediate, (caddr_t) 30},
-    {"basecolor", "BaseColor", XtRPixel, sizeof(Pixel),
-	 (Cardinal)&basepixel, XtRString, "cyan"},
-    {"spacercolor", "SpacerColor", XtRPixel, sizeof(Pixel),
-	 (Cardinal)&spacerpixel, XtRString, "gray"},
-    {"buildingcolor", "BuildingColor", XtRPixel, sizeof(Pixel),
-	 (Cardinal)&buildingpixel, XtRString, "yellow"},
-    {"vader1color", "Vader1Color", XtRPixel, sizeof(Pixel),
-	 (Cardinal)&vader1pixel, XtRString, "blue"},
-    {"vader2color", "Vader2Color", XtRPixel, sizeof(Pixel),
-	 (Cardinal)&vader2pixel, XtRString, "green"},
-    {"vader3color", "Vader3Color", XtRPixel, sizeof(Pixel),
-	 (Cardinal)&vader3pixel, XtRString, "red"},
-    {"shotcolor", "ShotColor", XtRPixel, sizeof(Pixel),
-	 (Cardinal)&shotpixel, XtRString, "lavender"},
-    {"vshotcolor", "VshotColor", XtRPixel, sizeof(Pixel),
-	 (Cardinal)&vshotpixel, XtRString, "orange"},
-    {"scorecolor", "ScoreColor", XtRPixel, sizeof(Pixel),
-	 (Cardinal)&scorepixel, XtRString, "white"},
-    {"maxshots", "MaxShots", XtRInt, sizeof(int),
-	 (Cardinal) &maxshots, XtRImmediate, (caddr_t) 1},
-    {"maxvshots", "MaxVshots", XtRInt, sizeof(int),
-	 (Cardinal) &maxvshots, XtRImmediate, (caddr_t) 6},
-    {"defaultfore", "DefaultFore", XtRPixel, sizeof(Pixel),
-	 (Cardinal) &defaultfore, XtRString, "white"},
-    {"defaultback", "DefaultBack", XtRPixel, sizeof(Pixel),
-	 (Cardinal) &defaultback, XtRString, "black"},
+	{"debug", "Debug", XtRBoolean, sizeof(Boolean),
+		XtOffsetOf(GameInfo, debug), XtRString, "off"},
+	{"font", "Font", XtRString, sizeof(String),
+		XtOffsetOf(GameInfo, vaderfont), XtRString, (String)"9x15"},
+	{"scale", "Scale", XtRInt, sizeof(int),
+		XtOffsetOf(GameInfo, scale), XtRImmediate, (caddr_t) 2},
+	{"basewait", "BaseWait", XtRInt, sizeof(int),
+		XtOffsetOf(GameInfo, basewait), XtRImmediate, (caddr_t) 10},
+	{"vaderwait", "VaderWait", XtRInt, sizeof(int),
+		XtOffsetOf(GameInfo, vaderwait), XtRImmediate, (caddr_t) 300},
+	{"spacerwait", "SpacerWait", XtRInt, sizeof(int),
+		XtOffsetOf(GameInfo, spacerwait), XtRImmediate, (caddr_t) 50},
+	{"shotwait", "ShotWait", XtRInt, sizeof(int),
+		XtOffsetOf(GameInfo, shotwait), XtRImmediate, (caddr_t) 10},
+	{"vshotwait", "VshotWait", XtRInt, sizeof(int),
+		XtOffsetOf(GameInfo, vshotwait), XtRImmediate, (caddr_t) 30},
+	{"basecolor", "BaseColor", XtRPixel, sizeof(Pixel),
+		XtOffsetOf(GameInfo, basepixel), XtRString, "cyan"},
+	{"spacercolor", "SpacerColor", XtRPixel, sizeof(Pixel),
+		XtOffsetOf(GameInfo, spacerpixel), XtRString, "gray"},
+	{"buildingcolor", "BuildingColor", XtRPixel, sizeof(Pixel),
+		XtOffsetOf(GameInfo, buildingpixel), XtRString, "yellow"},
+	{"vader1color", "Vader1Color", XtRPixel, sizeof(Pixel),
+		XtOffsetOf(GameInfo, vader1pixel), XtRString, "blue"},
+	{"vader2color", "Vader2Color", XtRPixel, sizeof(Pixel),
+		XtOffsetOf(GameInfo, vader2pixel), XtRString, "green"},
+	{"vader3color", "Vader3Color", XtRPixel, sizeof(Pixel),
+		XtOffsetOf(GameInfo, vader3pixel), XtRString, "red"},
+	{"shotcolor", "ShotColor", XtRPixel, sizeof(Pixel),
+		XtOffsetOf(GameInfo, shotpixel), XtRString, "lavender"},
+	{"vshotcolor", "VshotColor", XtRPixel, sizeof(Pixel),
+		XtOffsetOf(GameInfo, vshotpixel), XtRString, "orange"},
+	{"scorecolor", "ScoreColor", XtRPixel, sizeof(Pixel),
+		XtOffsetOf(GameInfo, scorepixel), XtRString, "white"},
+	{"maxshots", "MaxShots", XtRInt, sizeof(int),
+		XtOffsetOf(GameInfo, maxshots), XtRImmediate, (caddr_t) 1},
+	{"maxvshots", "MaxVshots", XtRInt, sizeof(int),
+		XtOffsetOf(GameInfo, maxvshots), XtRImmediate, (caddr_t) 6},
+	{"gameInfo.defaultfore", "DefaultFore", XtRPixel, sizeof(Pixel),
+		XtOffsetOf(GameInfo, defaultfore), XtRString, "white"},
+	{"defaultback", "DefaultBack", XtRPixel, sizeof(Pixel),
+		XtOffsetOf(GameInfo, defaultback), XtRString, "black"},
 };
 
 
@@ -161,25 +169,25 @@ int main(Cardinal argc, char **argv)
 			  &argc, argv);
   dpy = XtDisplay(toplevel);
   XtAddConverter(XtRString, XtRFloat, CvtStringToFloat, NULL, 0);
-  XtGetApplicationResources(toplevel, (caddr_t) NULL, 
-			    resources, XtNumber(resources),
-			    NULL, (Cardinal) 0);
-  AddResource("*background", &defaultback);
+  XtGetApplicationResources(toplevel, &windowSize, windowResourses, XtNumber(windowResourses), NULL, 0);
+  XtGetApplicationResources(toplevel, &gameInfo, resources, XtNumber(resources), NULL, 0);
+  AddResource("*background", &gameInfo.defaultback);
   if (DisplayCells(dpy, DefaultScreen(dpy)) <= 2)
     {
-      basepixel = defaultfore;
-      buildingpixel = defaultfore;
-      vader1pixel = defaultfore;
-      vader2pixel = defaultfore;
-      vader3pixel = defaultfore;
-      shotpixel = defaultfore;
-      vshotpixel = defaultfore;
-      scorepixel = defaultfore;
+      gameInfo.basepixel = gameInfo.defaultfore;
+      gameInfo.buildingpixel = gameInfo.defaultfore;
+      gameInfo.vader1pixel = gameInfo.defaultfore;
+      gameInfo.vader2pixel = gameInfo.defaultfore;
+      gameInfo.vader3pixel = gameInfo.defaultfore;
+      gameInfo.shotpixel = gameInfo.defaultfore;
+      gameInfo.vshotpixel = gameInfo.defaultfore;
+      gameInfo.scorepixel = gameInfo.defaultfore;
     }
-  if (scale<1) scale = 1;
-  if (scale>2) scale = 2;
-  width = scale*VWIDTH;
-  height = scale*VHEIGHT;
+  if (gameInfo.scale<1) gameInfo.scale = 1;
+  if (gameInfo.scale>2) gameInfo.scale = 2;
+
+  windowSize.width = gameInfo.scale*VWIDTH;
+  windowSize.height = gameInfo.scale*VHEIGHT;
 
   form = XtCreateManagedWidget ("form", formWidgetClass,
 				toplevel, NULL, 0);
@@ -189,12 +197,12 @@ int main(Cardinal argc, char **argv)
   XtSetArg (args[n], XtNright, XtChainLeft); n++;
   XtSetArg (args[n], XtNtop, XtChainTop); n++;
   XtSetArg (args[n], XtNbottom, XtChainTop); n++;
-  XtSetArg (args[n], XtNwidth, width); n++;
-  XtSetArg (args[n], XtNheight, height); n++;
-  
+  XtSetArg (args[n], XtNwidth, windowSize.width); n++;
+  XtSetArg (args[n], XtNheight, windowSize.height); n++;
+
   gamewidget = (VadersWidget)
     XtCreateManagedWidget("field", vadersWidgetClass, form, args, n);
-  
+
   XtSetKeyboardFocus (form, (Widget) gamewidget);
 
   n = 0;
@@ -204,29 +212,29 @@ int main(Cardinal argc, char **argv)
   XtSetArg (args[n], XtNbottom, XtChainTop); n++;
   XtSetArg (args[n], XtNfromHoriz, gamewidget); n++;
   XtSetArg (args[n], XtNhorizDistance, 5); n++;
-  XtSetArg (args[n], XtNwidth, scale*IWIDTH); n++;
-  XtSetArg (args[n], XtNheight, height/2); n++;
-  
+  XtSetArg (args[n], XtNwidth, gameInfo.scale*IWIDTH); n++;
+  XtSetArg (args[n], XtNheight, windowSize.height/2); n++;
+
   labelwidget = (VadersWidget)
     XtCreateManagedWidget("label", vadersWidgetClass, form, args, n);
 
   pausebutton = MakeCommandButton(form, "pause", Pause, labelwidget, gamewidget, NULL);
   XtSetArg(args[0], XtNlabel,_(" Start"));
-  XtSetArg(args[1], XtNforeground, defaultfore);
-  XtSetArg(args[2], XtNbackground, defaultback);
-  XtSetArg(args[3], XtNborderColor, defaultfore);
+  XtSetArg(args[1], XtNforeground, gameInfo.defaultfore);
+  XtSetArg(args[2], XtNbackground, gameInfo.defaultback);
+  XtSetArg(args[3], XtNborderColor, gameInfo.defaultfore);
   XtSetValues(pausebutton, args, 4);
   button = MakeCommandButton(form, "quit", Quit, pausebutton, gamewidget, NULL);
   XtSetArg(args[0], XtNlabel,_(" Quit "));
-  XtSetArg(args[1], XtNforeground, defaultfore);
-  XtSetArg(args[2], XtNbackground, defaultback);
-  XtSetArg(args[3], XtNborderColor, defaultfore);
+  XtSetArg(args[1], XtNforeground, gameInfo.defaultfore);
+  XtSetArg(args[2], XtNbackground, gameInfo.defaultback);
+  XtSetArg(args[3], XtNborderColor, gameInfo.defaultfore);
   XtSetValues(button, args, 4);
   infobutton = MakeCommandButton(form, "info", ShowInfo, button, gamewidget, NULL);
   XtSetArg(args[0], XtNlabel,_(" Info "));
-  XtSetArg(args[1], XtNforeground, defaultfore);
-  XtSetArg(args[2], XtNbackground, defaultback);
-  XtSetArg(args[3], XtNborderColor, defaultfore);
+  XtSetArg(args[1], XtNforeground, gameInfo.defaultfore);
+  XtSetArg(args[2], XtNbackground, gameInfo.defaultback);
+  XtSetArg(args[3], XtNborderColor, gameInfo.defaultfore);
   XtSetValues(infobutton, args, 4);
 
   XtRealizeWidget(toplevel);
@@ -242,7 +250,7 @@ char *path;
 {
      char *old, *new;
      extern char *getenv();
-     
+
      old = getenv("XFILESEARCHPATH");
      if (old) {
 #if defined(mips) || defined(hpux) || defined(sun)

@@ -59,15 +59,15 @@ int ReadBaseImage()
   int status;
 */
 
-  base->width = (scale == 1) ? base1_width : base2_width;
-  base->height = (scale == 1) ? base1_height : base2_height;
+  base->width = (gameInfo.scale == 1) ? base1_width : base2_width;
+  base->height = (gameInfo.scale == 1) ? base1_height : base2_height;
 
   base->shape_image = XCreateImage(dpy,
 				   DefaultVisual(dpy, DefaultScreen(dpy)),
 				   1,
 				   XYBitmap,
 				   0,
-				   (scale == 1) ? base1_bits : base2_bits,
+				   (gameInfo.scale == 1) ? base1_bits : base2_bits,
 				   base->width, base->height,
 				   8, 0);
 
@@ -79,9 +79,9 @@ int ReadBaseImage()
 			   1,
 			   XYBitmap,
 			   0,
-			   (scale == 1) ? explode1_bits : explode2_bits,
-			   (scale == 1) ? explode1_width : explode2_width,
-			   (scale == 1) ? explode1_height : explode2_height,
+			   (gameInfo.scale == 1) ? explode1_bits : explode2_bits,
+			   (gameInfo.scale == 1) ? explode1_width : explode2_width,
+			   (gameInfo.scale == 1) ? explode1_height : explode2_height,
 			   8, 0);
   explosion->bitmap_bit_order = LSBFirst;
   explosion->byte_order = LSBFirst;
@@ -217,7 +217,7 @@ XtIntervalId id;
     }
 
     if (!paused)
-      basetimerid = XtAddTimeOut(basewait, MoveBase, (Opaque) MoveBase);
+      basetimerid = XtAddTimeOut(gameInfo.basewait, MoveBase, (Opaque) MoveBase);
     if(base->v) {
       PaintBase(backgc);
       base->x += base->v;
@@ -230,13 +230,13 @@ XtIntervalId id;
 
 void MoveLeft()
 {
-  if(!paused) base->v= -scale;
+  if(!paused) base->v= -gameInfo.scale;
 }
 
 
 void MoveRight()
 {
-  if(!paused) base->v = scale;
+  if(!paused) base->v = gameInfo.scale;
 }
 
 
@@ -257,8 +257,8 @@ void Fire()
 #define NUMBUILDINGS 4
 #define HUNKROWS 4
 #define NUMHUNKS 10
-#define HUNKWIDTH (2*scale)
-#define HUNKHEIGHT (4*scale)
+#define HUNKWIDTH (2*gameInfo.scale)
+#define HUNKHEIGHT (4*gameInfo.scale)
 #define buildingwidth HUNKWIDTH*NUMHUNKS
 #define buildingheight HUNKHEIGHT*HUNKROWS
 
@@ -278,7 +278,7 @@ GC gc;
   int x, y;
 
   x = building->x+c*HUNKWIDTH;
-  y = gameheight-scale*45+r*HUNKHEIGHT;
+  y = gameheight-gameInfo.scale*45+r*HUNKHEIGHT;
 
   XFillRectangle(dpy, gamewindow, gc, x, y, HUNKWIDTH, HUNKHEIGHT);
 }
@@ -300,8 +300,8 @@ int x,y;
   for(i=0; i< NUMBUILDINGS; i++) {
     building = &buildings[i];
     if(x>=building->x && x<building->x+buildingwidth &&
-       y>=gameheight-scale*45 && y<gameheight-scale*45+buildingheight) {
-      r = (y-(gameheight-scale*45))/HUNKHEIGHT;
+       y>=gameheight-gameInfo.scale*45 && y<gameheight-gameInfo.scale*45+buildingheight) {
+      r = (y-(gameheight-gameInfo.scale*45))/HUNKHEIGHT;
       c = (x-building->x)/HUNKWIDTH;
       if (r<0 || r>=HUNKROWS)
 	printf(_("Error in row"));
@@ -323,8 +323,8 @@ void InitBuildings()
 
   for(i=0; i< NUMBUILDINGS; i++) {
     buildings[i].x = i*((gamewidth ?
-			 (scale*(VWIDTH-70)) :
-			 (gamewidth-scale*70)))/4+scale*35+(HUNKWIDTH*NUMHUNKS)/2;
+			 (gameInfo.scale*(VWIDTH-70)) :
+			 (gamewidth-gameInfo.scale*70)))/4+gameInfo.scale*35+(HUNKWIDTH*NUMHUNKS)/2;
     for (j=0; j<HUNKROWS; j++)
       for (k = 0; k < NUMHUNKS; k++) 
 	buildings[i].hunks[j][k] = TRUE;

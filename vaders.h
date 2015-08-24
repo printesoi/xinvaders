@@ -88,7 +88,35 @@ typedef struct _VadersRec {
     VadersPart vaders;
 } VadersRec, *VadersWidget;
 
+typedef struct {
+	Boolean debug;
+	char *vaderfont;
+	int scale;
+	int basewait;		/* Number of milleseconds to wait between */
+				/* moving base. */
+	int vaderwait;		/* Number of milleseconds to wait between */
+				/* moving vaders. */
+	int spacerwait;		/* Number of milliseconds to wait between */
+				/* moving spacers. */
+	int shotwait;
+	int vshotwait;
+	Pixel basepixel;
+	Pixel spacerpixel;
+	Pixel buildingpixel;
+	Pixel vader1pixel;
+	Pixel vader2pixel;
+	Pixel vader3pixel;
+	Pixel shotpixel;
+	Pixel vshotpixel;
+	Pixel scorepixel;
+	int maxshots;		/* How many shots are allowed to exist at */
+				/* once. */
+	int maxvshots;		/* How many shots are allowed to exist at */
+				/* once. */
+	Pixel defaultfore, defaultback;
+} GameInfo;
 
+ext GameInfo gameInfo;
 
 
 /*
@@ -96,9 +124,7 @@ typedef struct _VadersRec {
  */
 
 ext Widget pausebutton, infobutton;
-ext int scale;
 
-ext Boolean debug;
 ext int level;
 
 ext Display *dpy;
@@ -111,30 +137,17 @@ ext int basesleft;
 
 /* Base info: */
 
-ext int basewait;		/* Number of milleseconds to wait between */
-				/* moving base. */
-
 ext XtIntervalId basetimerid;
 
-ext Pixel basepixel;
-ext Pixel buildingpixel;
 ext Boolean basedestroyed;	/* TRUE if the base is non-existant */
 
 /* Vader info: */
 
 ext XtIntervalId vadertimerid;
-ext Pixel vader1pixel;
-ext Pixel vader2pixel;
-ext Pixel vader3pixel;
-ext int vaderwait;		/* Number of milleseconds to wait between */
-				/* moving vaders. */
 
 /* Spacer info */
 
-ext Pixel spacerpixel;
 ext XtIntervalId spacertimerid;
-ext int spacerwait;		/* Number of milliseconds to wait between */
-				/* moving spacers. */
 ext int spacerappear;		/* same, but for the interval between appearances */
 
 ext Boolean spacer_shown;    	/* Currnet_Spacer is something */
@@ -144,20 +157,10 @@ ext int spacer_counter;		/* number of cycles to create a spacer */
 
 ext XtIntervalId shottimerid;
 ext XtIntervalId vshottimerid;
-ext Pixel shotpixel;
-ext Pixel vshotpixel;
-ext int shotwait;
-ext int vshotwait;
-ext int maxshots;		/* How many shots are allowed to exist at */
-				/* once. */
-ext int maxvshots;		/* How many shots are allowed to exist at */
-				/* once. */
 ext int numshots;		/* how many shots (from the base) there are right now. */
 ext int numvshots;		/* how many shots (from vaders) there are right now. */
 
 /* Score info */
-
-ext Pixel scorepixel;
 
 ext int bases, nextbonus, lastscore;
 extern int hiscore;
@@ -227,8 +230,6 @@ void InitShot();
 void MoveShots();
 void MoveVshots();
 void PaintAllShots();
-ext Pixel defaultfore, defaultback;
 
-ext char *vaderfont;
 
-#endif _vaders_h
+#endif /* _vaders_h */
