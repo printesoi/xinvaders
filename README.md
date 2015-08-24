@@ -1,2 +1,2 @@
 # xinvaders
-A port of the xinvaders game
+A port of the xinvaders game made to compile with recent libxt

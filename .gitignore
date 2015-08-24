@@ -1,0 +1,10 @@
+Makefile
+*.o
+config.cache
+config.h
+config.log
+config.status
+po/Makefile.in
+po/POTFILES
+stamp-h
+intl/po2tbl.sed
